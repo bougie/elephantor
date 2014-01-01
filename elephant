@@ -13,7 +13,7 @@ except:
 
 def get_proto():
 	if len(BACKUP_BACKEND['dir'].strip()) == 0:
-		BACKUP_BACKEND['dir'] = '~'
+		BACKUP_BACKEND['dir'] = '/'
 
 	extra = ''
 	if BACKUP_BACKEND['type'] == 'file':
