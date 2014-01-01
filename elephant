@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+
+import sys
+import os
+import subprocess
+import argparse
+
+try:
+	from config import *
+except:
+	print "Config file does not exist"
+	sys.exit(1)
+
+def get_proto():
+	if len(BACKUP_BACKEND['dir'].strip()) == 0:
+		BACKUP_BACKEND['dir'] = '~'
+
+	extra = ''
+	if BACKUP_BACKEND['type'] == 'file':
+		proto = 'file://'
+
+		if not os.path.exists(BACKUP_BACKEND['dir']):
+			print "Backup dir does not exist"
+			sys.exit(1)
+	elif BACKUP_BACKEND['type'] == 'ftp':
+		proto = 'ftp://%s@%s' % (BACKUP_BACKEND['user'], BACKUP_BACKEND['host'])
+		extra = 'FTP_PASSWORD="%s"' % (BACKUP_BACKEND['password'])
+
+	return proto, extra
+
+def do_backup():
+	bkp_dirs_list = ''
+	for bdir in INPUT_DIR:
+		bdir = os.path.join(INPUT_DIR_ROOT, bdir)
+		if len(bkp_dirs_list) == 0:
+			bkp_dirs_list = str(bdir)
+		else:
+			bkp_dirs_list += "\n" + str(bdir)
+
+	tmp_bkplist = '/tmp/bkplist'
+	try:
+		bkp_dirs_list_file = open(tmp_bkplist, 'w')
+		bkp_dirs_list_file.write(bkp_dirs_list)
+		bkp_dirs_list_file.close()
+	except Exception, e:
+		print "Unable to generate temporary directories list"
+		if DEBUG:
+			print str(e)
+		sys.exit(1)
+
+	src = "--include-globbing-filelist %s --exclude '**' %s" % (tmp_bkplist, INPUT_DIR_ROOT)
+
+	proto, extra = get_proto()
+
+	cmd = "PASSPHRASE='%s' %s duplicity incr --full-if-older-than %s %s %s%s" % (PASSPHRASE, extra, BACKUP_BACKEND['periodicity'], src, proto, BACKUP_BACKEND['dir'])
+	if DEBUG:
+		print "DEBUG: CMD: " + cmd
+
+	rc = subprocess.call(cmd, shell=True)
+
+def do_list(time=None):
+	proto, extra = get_proto()
+
+	options = ''
+	if time:
+		options = '--time %s' % (time)
+
+	cmd = "PASSPHRASE='%s' %s duplicity list-current-files %s %s%s 2> /dev/null" % (PASSPHRASE, extra, options, proto, BACKUP_BACKEND['dir'])
+	if DEBUG:
+		print "DEBUG: CMD: " + cmd
+
+	rc = subprocess.call(cmd, shell=True)
+
+def do_restore():
+	pass
+
+def do_status(verbose=True):
+	proto, extra = get_proto()
+
+	if verbose:
+		cmd = "PASSPHRASE='%s' %s duplicity collection-status %s%s" % (PASSPHRASE, extra, proto, BACKUP_BACKEND['dir'])
+	else:
+		cmd = "PASSPHRASE='%s' %s duplicity collection-status %s%s | grep -E 'Incr|Full|Int'" % (PASSPHRASE, extra, proto, BACKUP_BACKEND['dir'])
+	if DEBUG:
+		print "DEBUG: CMD: " + cmd
+
+	rc = subprocess.call(cmd, shell=True)
+
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser(prog='backup', description='Duplicity frontend for easier backup system')
+	parser.add_argument('method', choices=['backup', 'restore', 'list', 'status'])
+	parser.add_argument('-t', '--time', help='select time of the backup (format yyyy-mm-dd)')
+	parser.add_argument('-s', '--src', nargs = '?', help='source dir or URL for the backup or the restore')
+	parser.add_argument('-d', '--dst', nargs = '?', type=str, help='destination dir or URL for the backup or the restore')
+	parser.add_argument('-f', '--file', nargs = '?', type=str, help='file to use in the command')
+	args = parser.parse_args()
+
+	if not BACKUP_BACKEND['type'] in ['file', 'ftp']:
+		print "Backend de sauvegarde non supporte"
+		sys.exit(1)
+
+	if args.method == 'backup':
+		do_backup()
+	elif args.method == 'restore':
+		do_restore()
+	elif args.method == 'list':
+		do_list(time=args.time)
+	elif args.method == 'status':
+		do_status()
