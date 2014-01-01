@@ -23,8 +23,17 @@ def get_proto():
 			print "Backup dir does not exist"
 			sys.exit(1)
 	elif BACKUP_BACKEND['type'] == 'ftp':
-		proto = 'ftp://%s@%s' % (BACKUP_BACKEND['user'], BACKUP_BACKEND['host'])
-		extra = 'FTP_PASSWORD="%s"' % (BACKUP_BACKEND['password'])
+		if not len(BACKUP_BACKEND['host'].strip()) == 0:
+			if not len(BACKUP_BACKEND['user'].strip()) == 0:
+				proto = 'ftp://%s@%s' % (BACKUP_BACKEND['user'], BACKUP_BACKEND['host'])
+			else:
+				proto = 'ftp://%s' % (BACKUP_BACKEND['host'])
+
+			if not len(BACKUP_BACKEND['password'].strip()) == 0:
+				extra = 'FTP_PASSWORD="%s"' % (BACKUP_BACKEND['password'])
+		else:
+			print "You must specify a ftp host"
+			sys.exit(1)
 
 	return proto, extra
 
