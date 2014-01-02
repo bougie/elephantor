@@ -8,8 +8,8 @@ BACKUP_BACKEND = {
 }
 
 # Directories to save
-INPUT_DIR_ROOT = '/Users/bougie'
-INPUT_DIR = ['sysadmin']
+INPUT_DIR_ROOT = ''
+INPUT_DIR = ['']
 
 # Passphrase for GPG
 PASSPHRASE = ''
