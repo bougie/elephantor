@@ -27,7 +27,9 @@ def get_proto():
 	elif BACKUP_BACKEND['type'] == 'ftp':
 		if not len(BACKUP_BACKEND['host'].strip()) == 0:
 			if not len(BACKUP_BACKEND['user'].strip()) == 0:
-				proto = 'ftp://%s@%s' % (BACKUP_BACKEND['user'], BACKUP_BACKEND['host'])
+				proto = 'ftp://%s@%s' % (
+					BACKUP_BACKEND['user'],
+					BACKUP_BACKEND['host'])
 			else:
 				proto = 'ftp://%s' % (BACKUP_BACKEND['host'])
 
@@ -59,11 +61,19 @@ def do_backup():
 			print str(e)
 		sys.exit(1)
 
-	src = "--include-globbing-filelist %s --exclude '**' %s" % (tmp_bkplist, INPUT_DIR_ROOT)
+	src = "--include-globbing-filelist %s --exclude '**' %s" % (
+		tmp_bkplist,
+		INPUT_DIR_ROOT)
 
 	proto, extra = get_proto()
 
-	cmd = "PASSPHRASE='%s' %s duplicity incr --full-if-older-than %s %s %s%s" % (PASSPHRASE, extra, BACKUP_BACKEND['periodicity'], src, proto, BACKUP_BACKEND['dir'])
+	cmd = "PASSPHRASE='%s' %s duplicity incr --full-if-older-than %s %s %s%s" % (
+		PASSPHRASE,
+		extra,
+		BACKUP_BACKEND['periodicity'],
+		src,
+		proto,
+		BACKUP_BACKEND['dir'])
 	if DEBUG:
 		print "DEBUG: CMD: " + cmd
 
@@ -76,7 +86,12 @@ def do_list(time=None):
 	if time:
 		options = '--time %s' % (time)
 
-	cmd = "PASSPHRASE='%s' %s duplicity list-current-files %s %s%s 2> /dev/null" % (PASSPHRASE, extra, options, proto, BACKUP_BACKEND['dir'])
+	cmd = "PASSPHRASE='%s' %s duplicity list-current-files %s %s%s 2> /dev/null" % (
+		PASSPHRASE,
+		extra,
+		options,
+		proto,
+		BACKUP_BACKEND['dir'])
 	if DEBUG:
 		print "DEBUG: CMD: " + cmd
 
@@ -104,9 +119,22 @@ def do_restore(dst, files=None, time=None):
 			ls_files = '--file-to-restore ' + files
 
 	if time:
-		cmd = "PASSPHRASE='%s' %s duplicity restore %s --time %s %s%s %s" % (PASSPHRASE, extra, ls_files, time, proto, BACKUP_BACKEND['dir'], dst)
+		cmd = "PASSPHRASE='%s' %s duplicity restore %s --time %s %s%s %s" % (
+			PASSPHRASE,
+			extra,
+			ls_files,
+			time,
+			proto,
+			BACKUP_BACKEND['dir'],
+			dst)
 	else:
-		cmd = "PASSPHRASE='%s' %s duplicity restore %s %s%s %s" % (PASSPHRASE, extra, ls_files, proto, BACKUP_BACKEND['dir'], dst)
+		cmd = "PASSPHRASE='%s' %s duplicity restore %s %s%s %s" % (
+			PASSPHRASE,
+			extra,
+			ls_files,
+			proto,
+			BACKUP_BACKEND['dir'],
+			dst)
 
 	if DEBUG:
 		print "DEBUG: CMD: " + cmd
@@ -117,9 +145,17 @@ def do_status(verbose=True):
 	proto, extra = get_proto()
 
 	if verbose:
-		cmd = "PASSPHRASE='%s' %s duplicity collection-status %s%s" % (PASSPHRASE, extra, proto, BACKUP_BACKEND['dir'])
+		cmd = "PASSPHRASE='%s' %s duplicity collection-status %s%s" % (
+			PASSPHRASE,
+			extra,
+			proto,
+			BACKUP_BACKEND['dir'])
 	else:
-		cmd = "PASSPHRASE='%s' %s duplicity collection-status %s%s | grep -E 'Incr|Full|Int'" % (PASSPHRASE, extra, proto, BACKUP_BACKEND['dir'])
+		cmd = "PASSPHRASE='%s' %s duplicity collection-status %s%s | grep -E 'Incr|Full|Int'" % (
+			PASSPHRASE,
+			extra,
+			proto,
+			BACKUP_BACKEND['dir'])
 	if DEBUG:
 		print "DEBUG: CMD: " + cmd
 
@@ -129,21 +165,38 @@ def parse_time(time):
 	if not time:
 		return None
 
-	if re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time) or re.match('^[0-9]{2}-[0-9]{2}-[0-9]{4}$', time):
+	if re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time):
+		return time
+	elif re.match('^[0-9]{2}-[0-9]{2}-[0-9]{4}$', time):
 		return time
 	elif re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}', time):
-		return datetime.datetime.strptime(time, '%Y-%m-%d %H:%M').strftime('%Y-%m-%dT%H:%M:00%z')
+		dt = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M')
+		return dt.strftime('%Y-%m-%dT%H:%M:00%z')
 	elif re.match('^[0-9]{2}-[0-9]{2}-[0-9]{4} [0-9]{2}:[0-9]{2}', time):
-		return datetime.datetime.strptime(time, '%d-%m-%Y %H:%M').strftime('%Y-%m-%dT%H:%M:00%z')
+		dt = datetime.datetime.strptime(time, '%d-%m-%Y %H:%M')
+		return dt.strftime('%Y-%m-%dT%H:%M:00%z')
 	else:
 		raise ValueError('Date is not valide')
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(prog='backup', description='Duplicity frontend for easier backup system')
-	parser.add_argument('method', choices=['backup', 'restore', 'list', 'status'])
-	parser.add_argument('-t', '--time', type=str, help='Select the date of the backup (format yyyy-mm-dd or yyyy-mm-dd H:M)')
-	parser.add_argument('-f', '--file', type=str, help='Directory or file to restore. It can also be a path to a file which contains a list of files or directories to restore')
-	parser.add_argument('-d', '--dst', type=str, help='Destination directory of the restore (or pwd if it\'s empty)')
+	parser = argparse.ArgumentParser(
+		prog='backup',
+		description='Duplicity frontend for easier backup system')
+	parser.add_argument(
+		'method',
+		choices=['backup', 'restore', 'list', 'status'])
+	parser.add_argument(
+		'-t', '--time',
+		type=str,
+		help='Select the date of the backup (format yyyy-mm-dd or yyyy-mm-dd H:M)')
+	parser.add_argument(
+		'-f', '--file',
+		type=str,
+		help='Directory or file to restore. It can also be a path to a file which contains a list of files or directories to restore')
+	parser.add_argument(
+		'-d', '--dst',
+		type=str,
+		help='Destination directory of the restore (or pwd if it\'s empty)')
 	args = parser.parse_args()
 
 	if not BACKUP_BACKEND['type'] in ['file', 'ftp']:
