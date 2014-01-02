@@ -141,10 +141,9 @@ def parse_time(time):
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(prog='backup', description='Duplicity frontend for easier backup system')
 	parser.add_argument('method', choices=['backup', 'restore', 'list', 'status'])
-	parser.add_argument('-t', '--time', help='select time of the backup (format yyyy-mm-dd)')
-	parser.add_argument('-s', '--src', nargs = '?', help='source dir or URL for the backup or the restore')
-	parser.add_argument('-d', '--dst', nargs = '?', type=str, help='destination dir or URL for the backup or the restore')
-	parser.add_argument('-f', '--file', nargs = '?', type=str, help='file to use in the command')
+	parser.add_argument('-t', '--time', type=str, help='Select the date of the backup (format yyyy-mm-dd or yyyy-mm-dd H:M)')
+	parser.add_argument('-f', '--file', type=str, help='Directory or file to restore. It can also be a path to a file which contains a list of files or directories to restore')
+	parser.add_argument('-d', '--dst', type=str, help='Destination directory of the restore (or pwd if it\'s empty)')
 	args = parser.parse_args()
 
 	if not BACKUP_BACKEND['type'] in ['file', 'ftp']:
@@ -160,7 +159,7 @@ if __name__ == "__main__":
 	if args.method == 'backup':
 		do_backup()
 	elif args.method == 'restore':
-		do_restore(files=args.src, dst=args.dst, time=args.time)
+		do_restore(files=args.file, dst=args.dst, time=args.time)
 	elif args.method == 'list':
 		do_list(time=args.time)
 	elif args.method == 'status':
