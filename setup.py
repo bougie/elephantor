@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 setup(name='elephant_backup',
-      version='0.1',
+      version='0.2',
       description="Duplicity frontend",
       long_description=readme(),
       classifiers=[
