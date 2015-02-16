@@ -8,6 +8,8 @@ import re
 import datetime
 
 try:
+	if os.path.exists('/etc/elephan/config.py'):
+		sys.path.append('/etc/elephant')
 	from config import *
 except:
 	print "Config file does not exist"

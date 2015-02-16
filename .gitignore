@@ -1,2 +1,8 @@
 *.pyc
 config.py
+__pycache__
+.ropeproject
+/dist/
+/build/
+/*.egg-info
+/*.egg
