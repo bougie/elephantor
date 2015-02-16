@@ -1,7 +1,7 @@
-Elephant
-=========
+Elephantor
+===========
 
-**elephant** is a frontend to the duplicity backup tool written in python
+**elephantor** is a frontend to the duplicity backup tool written in python
 
 Install
 =======
@@ -9,17 +9,17 @@ Install
 **Install from pip**
 ::
 
-$ pip install elephant
+$ pip install elephantor
 
 **Install from github**
 ::
 
-$ git clone https://github.com/bougie/elephant
+$ git clone https://github.com/bougie/elephantor
 
 **Configuration**
 ::
 
-# cp /etc/elephant/config.sample.py /etc/elephant/config.py
+# cp /etc/elephantor/config.sample.py /etc/elephantor/config.py
 
 And fill variables with right value.
 
@@ -29,25 +29,25 @@ How-to
 **launch a backup**
 ::
 
-$ elephant backup
+$ elephator backup
 
 **get a list of saved files**
 ::
 
-$ elephant list
+$ elephator list
 
 **get a list of saved files for a given date**
 ::
 
-$ elephant list --time 2014-01-01
+$ elephator list --time 2014-01-01
 
 **do a restore in the /tmp/fubar directory**
 ::
 
-$ elephant restore -d /tmp/fubar
+$ elephator restore -d /tmp/fubar
 
 **restore the file toto ine the current directory**
 ::
 
-$ elephant restore -f toto
+$ elephator restore -f toto
 

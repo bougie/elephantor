@@ -5,8 +5,8 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
-setup(name='elephant_backup',
-      version='0.2',
+setup(name='elephantor',
+      version='0.!',
       description="Duplicity frontend",
       long_description=readme(),
       classifiers=[
@@ -17,11 +17,11 @@ setup(name='elephant_backup',
           'Topic :: System :: Archiving :: Backup',
       ],
       keywords='duplicity backup rsync ftp unison sftp',
-      url='https://github.com/bougie/elephant',
+      url='https://github.com/bougie/elephantor',
       author='David Hymonnet',
       author_email='bougie@appartland.eu',
       license='BSD',
-      scripts=['bin/elephant'],
-      data_files=[('/etc/elephant/', ['config/config.sample.py'])],
+      scripts=['bin/elephantor'],
+      data_files=[('/etc/elephantor/', ['config/config.sample.py'])],
       include_package_data=True,
       zip_safe=False)
